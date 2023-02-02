@@ -1,39 +1,43 @@
+import { Component } from 'react';
 import styles from './modal.module.css';
 import { createPortal } from 'react-dom';
-import { Component } from 'react';
 import PropTypes from 'prop-types';
 
 const ModalRoot = document.querySelector('#ModalRoot');
 
 class Modal extends Component {
+    state = {};
+
     componentDidMount() {
-        window.addEventListener('keydown', this.keyDown);
+        window.addEventListener('keydown', this.keydownClick);
     }
 
     componentWillUnmount() {
-        window.removeEventListener('keydown', this.keyDown);
+        window.removeEventListener('keydown', this.keydownClick);
     }
 
-    keyDown = e => {
-        if (e.code === 'Escape') {
+    keydownClick = evt => {
+        if (evt.code === 'Escape') {
             this.props.onClose();
         }
     };
 
-    onOverlayClose = e => {
-        if (e.currentTarget === e.target) {
+    backdropClick = evt => {
+        if (evt.target === evt.currentTarget) {
             this.props.onClose();
         }
     };
 
     render() {
         const { children } = this.props;
-        const { largeImageURL } = this.props.image;
+        const { backdropClick } = this;
+        const { onClick, image: { alt, url } } = this.props;
+
         return createPortal(
-            <div onClick={this.onOverlayClose} className={styles.overlay}>
+            <div className={styles.overlay} onClick={backdropClick}>
                 <div className={styles.modal}>
                     {children}
-                    <img className={styles.img} src={largeImageURL} alt="img" />
+                    <img src={url} alt={alt} onClick={onClick} />
                 </div>
             </div>,
             ModalRoot
